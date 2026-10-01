@@ -2,15 +2,18 @@
 // Browsers can't call Yahoo directly (CORS), so this tiny function does it.
 const ALLOWED = new Set([
   "^NSEI", "^NSEBANK", "^BSESN", "CL=F",
-  "GC=F", "BTC-USD", "EURUSD=X", "GBPUSD=X", "JPY=X", "INR=X"
+  "GC=F", "BTC-USD", "EURUSD=X", "GBPUSD=X", "JPY=X", "INR=X",
+  // BlazeFX
+  "AUDUSD=X", "CAD=X", "CHF=X", "NZDUSD=X", "EURJPY=X", "GBPJPY=X", "SI=F", "ETH-USD"
 ]);
-const INTERVALS = new Set(["1m", "5m", "15m", "60m"]);
+const INTERVALS = new Set(["1m", "5m", "15m", "60m", "1d"]);
+const RANGES = new Set(["5d", "1mo", "3mo"]);
 
 module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const symbol = String(req.query.symbol || "");
   const interval = String(req.query.interval || "5m");
-  const range = "5d";
+  const range = RANGES.has(String(req.query.range)) ? String(req.query.range) : "5d";
   if (!ALLOWED.has(symbol) || !INTERVALS.has(interval)) {
     res.status(400).json({ error: "Symbol not allowed" });
     return;
