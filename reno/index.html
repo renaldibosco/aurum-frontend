@@ -1,0 +1,336 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reno's BOF">
+<meta name="theme-color" content="#07040D">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>Reno's BOF</title>
+<style>
+  :root{
+    --bg:#07040D; --card:#120B1F; --card2:#1A1030; --line:#2A1D45;
+    --text:#F3EEFF; --mute:#9C8FBF; --gold:#F5C451; --purple:#A855F7;
+    --bull:#22C55E; --bear:#EF4444;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,Roboto,sans-serif;overscroll-behavior:none}
+  .wrap{padding:max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));max-width:900px;margin:0 auto}
+  .install{background:linear-gradient(135deg,#2a1650,#120B1F);border:1px solid #F5C45166;border-radius:14px;padding:12px 14px;margin-top:12px;font-size:13px;line-height:1.5}
+  .install b{color:var(--gold)}
+  header{display:flex;align-items:center;gap:10px}
+  header h1{font-size:21px;margin:0;letter-spacing:.3px}
+  header h1 span{color:var(--gold)}
+  .pill{margin-left:auto;font-size:11px;font-weight:700;padding:5px 10px;border-radius:99px;
+    background:#241a38;color:var(--mute);letter-spacing:.6px}
+  .pill.live{background:rgba(34,197,94,.15);color:var(--bull)}
+  .pill.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--bull);margin-right:6px;animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.2}}
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+  .tabs.fx{grid-template-columns:repeat(3,1fr)}
+  .mkt{display:flex;margin-top:14px}
+  .mkt button{flex:1}
+  .tab{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 4px;
+    text-align:center;font-size:12px;font-weight:700;color:var(--mute);position:relative}
+  .tab.on{border-color:var(--gold);color:var(--text);background:var(--card2)}
+  .tab .b{display:block;font-size:10px;font-weight:600;margin-top:3px;color:var(--mute)}
+  .tab .b.hot{color:var(--gold)}
+  .quote{display:flex;align-items:flex-end;justify-content:space-between;margin-top:14px}
+  .price{font-size:30px;font-weight:800;letter-spacing:-.5px}
+  .chg{font-size:14px;font-weight:700;margin-top:2px}
+  .up{color:var(--bull)} .down{color:var(--bear)}
+  .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{background:none;border:0;color:var(--mute);font-weight:700;font-size:12px;padding:8px 11px}
+  .seg button.on{background:var(--gold);color:#1a1200}
+  .upd{font-size:11px;color:var(--mute);margin-top:4px}
+  #chart{height:56vh;min-height:320px;margin-top:10px;border-radius:14px;overflow:hidden;
+    border:1px solid var(--line);position:relative}
+  .msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:20px;color:var(--mute);font-size:14px;z-index:5;background:rgba(7,4,13,.7)}
+  .levels{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .chip{font-size:11px;padding:4px 8px;border-radius:8px;background:var(--card);border:1px solid var(--line);color:var(--mute)}
+  .chip b{color:var(--text);font-weight:700}
+  h2{font-size:15px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+  h2 small{color:var(--mute);font-weight:500;font-size:12px}
+  .sig{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+  .sig.hot{border-color:rgba(245,196,81,.6);box-shadow:0 0 18px rgba(168,85,247,.25)}
+  .sig .top{display:flex;align-items:center;gap:10px}
+  .score{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:15px;flex:none;border:3px solid var(--line)}
+  .score.s4,.score.s5{border-color:var(--gold);color:var(--gold)}
+  .score.s6{border-color:var(--gold);background:var(--gold);color:#1a1200}
+  .sig .t1{font-weight:800;font-size:15px}
+  .sig .t2{font-size:12px;color:var(--mute);margin-top:2px}
+  .tag{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;margin-left:auto}
+  .tag.bull{background:rgba(34,197,94,.15);color:var(--bull)}
+  .tag.bear{background:rgba(239,68,68,.15);color:var(--bear)}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:10px;font-size:12px}
+  .facts div{color:var(--mute)} .facts div.ok{color:var(--text)}
+  .plan{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+  .plan div{background:var(--bg);border-radius:9px;padding:7px;text-align:center}
+  .plan small{display:block;font-size:10px;color:var(--mute);margin-bottom:2px}
+  .plan b{font-size:13px}
+  .empty{color:var(--mute);font-size:13px;background:var(--card);border:1px dashed var(--line);
+    border-radius:14px;padding:16px;text-align:center}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0}
+  .row + .row{border-top:1px solid var(--line)}
+  .row label{font-size:14px} .row small{display:block;color:var(--mute);font-size:11px;margin-top:2px}
+  .sw{width:50px;height:28px;border-radius:99px;background:#2a2140;position:relative;flex:none;border:0}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;
+    background:#fff;transition:.2s}
+  .sw.on{background:var(--gold)} .sw.on::after{left:25px}
+  .btn{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;
+    padding:9px 12px;font-weight:700;font-size:12px}
+  .foot{color:var(--mute);font-size:11px;line-height:1.5;margin-top:16px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="install" id="install" style="display:none">📲 <b>Install on iPhone:</b> tap <b>Share</b> (square with arrow) → <b>Add to Home Screen</b>. It opens like a real app with the gold heart icon.</div>
+  <header>
+    <svg width="34" height="34" viewBox="0 0 108 108" aria-hidden="true">
+      <defs>
+        <linearGradient id="hg" x1="12" y1="3" x2="12" y2="21.35" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#FFE9A8"/><stop offset=".5" stop-color="#F5C451"/><stop offset="1" stop-color="#B7791F"/>
+        </linearGradient>
+        <path id="hp" d="M12,21.35l-1.45,-1.32C5.4,15.36 2,12.28 2,8.5 2,5.42 4.42,3 7.5,3c1.74,0 3.41,0.81 4.5,2.09C13.09,3.81 14.76,3 16.5,3 19.58,3 22,5.42 22,8.5c0,3.78 -3.4,6.86 -8.55,11.54L12,21.35z"/>
+      </defs>
+      <use href="#hp" transform="translate(-4.5 -6.7) scale(4.875)" fill="#C084FC" fill-opacity=".18"/>
+      <use href="#hp" transform="translate(9 7.3) scale(3.75)" fill="#A855F7" fill-opacity=".35"/>
+      <use href="#hp" transform="translate(21 19.5) scale(2.75)" fill="url(#hg)"/>
+    </svg>
+    <h1>Reno's <span>BOF</span></h1>
+    <div id="status" class="pill">…</div>
+  </header>
+
+  <div class="seg mkt" id="mkt"><button data-m="in" class="on">🇮🇳 India</button><button data-m="fx">🌍 Forex</button></div>
+  <div class="tabs" id="tabs"></div>
+
+  <div class="quote">
+    <div>
+      <div class="price" id="price">—</div>
+      <div class="chg" id="chg"></div>
+      <div class="upd" id="upd"></div>
+    </div>
+    <div class="seg" id="tfs">
+      <button data-tf="1m">1m</button><button data-tf="5m" class="on">5m</button><button data-tf="15m">15m</button>
+    </div>
+  </div>
+
+  <div id="chart"><div class="msg" id="msg">Loading live market…</div></div>
+  <div class="levels" id="levels"></div>
+
+  <h2>BOF signals <small id="sigcount"></small></h2>
+  <div id="signals"></div>
+
+  <h2>Alerts on iPhone</h2>
+  <div class="card" style="font-size:13px;line-height:1.6;color:var(--mute)">
+    iPhone web apps can't scan in the background, so get alerts from the <b style="color:var(--text)">TradingView app</b>:
+    add the <b style="color:var(--gold)">Reno's BOF</b> indicator to your chart, then tap ⏰ → Condition: Reno's BOF →
+    "Any alert() function call" → Notify in app. Same BOF logic, live data, instant alerts.
+  </div>
+
+  <div class="foot">
+    Data: Yahoo Finance (can lag up to ~1 min). Crude = NYMEX WTI (CL). XAUUSD = COMEX gold futures (GC), may lag ~10 min.<br>
+    A data tool, not investment advice. Charts by TradingView Lightweight Charts™.<br>
+    Reno's BOF · by Pablo Reinaldez
+  </div>
+</div>
+
+<script src="engine.js"></script>
+<script src="lwc.js"></script>
+<script>
+const GROUPS = { in: ["NIFTY","BANKNIFTY","SENSEX","CRUDE"], fx: ["GOLD","BTC","EURUSD","GBPUSD","USDJPY","USDINR"] };
+let mkt = "in";
+let SYMS = GROUPS.in;
+const LABEL = {NIFTY:"NIFTY 50",BANKNIFTY:"BANK NIFTY",SENSEX:"SENSEX",CRUDE:"CRUDE",
+  GOLD:"XAUUSD",BTC:"BTCUSD",EURUSD:"EURUSD",GBPUSD:"GBPUSD",USDJPY:"USDJPY",USDINR:"USDINR"};
+const hasBridge = typeof Android !== "undefined";
+let cur = "NIFTY", tf = "5m", lastData = null, timer = null, firstFit = true;
+const best = {};
+
+/* ---------- bridge ---------- */
+const cbs = {}; let seq = 0;
+function load(name, t){
+  return new Promise(res => {
+    if (!hasBridge) return res({error:"Open this inside the Reno's BOF app."});
+    const id = "c" + (++seq); cbs[id] = res; Android.load(name, t, id);
+  });
+}
+window.onData = (id, data) => { const f = cbs[id]; delete cbs[id]; if (f) f(data); };
+
+/* ---------- chart ---------- */
+const el = document.getElementById("chart");
+const chart = LightweightCharts.createChart(el, {
+  autoSize: true,
+  layout: { background: {type:"solid", color:"#07040D"}, textColor:"#9C8FBF", fontSize: 11 },
+  grid: { vertLines:{color:"#140D22"}, horzLines:{color:"#140D22"} },
+  rightPriceScale: { borderColor:"#2A1D45" },
+  timeScale: { borderColor:"#2A1D45", timeVisible:true, secondsVisible:false, rightOffset: 4 },
+  crosshair: { mode: 0 }
+});
+const candles = chart.addCandlestickSeries({
+  upColor:"#22C55E", downColor:"#EF4444", borderVisible:false,
+  wickUpColor:"#22C55E", wickDownColor:"#EF4444"
+});
+const vwapLine = chart.addLineSeries({ color:"#F5C451", lineWidth:1, priceLineVisible:false,
+  lastValueVisible:false, crosshairMarkerVisible:false });
+let priceLines = [];
+const LVL_COLOR = {PDH:"#EF4444",PDL:"#22C55E",H4:"#F472B6",L4:"#34D399",H3:"#C084FC",L3:"#60A5FA",ORH:"#FB923C",ORL:"#2DD4BF"};
+
+function digits(p){ const a = Math.abs(p); return a < 10 ? 5 : a < 200 ? 3 : a < 1000 ? 2 : 1; }
+function fmt(p){ return p == null ? "—" : Number(p).toLocaleString("en-IN",{minimumFractionDigits:digits(p),maximumFractionDigits:digits(p)}); }
+function hhmm(t){ const d = new Date(t*1000); return String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0"); }
+function dayStr(t){ const d = new Date(t*1000); return d.getUTCDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()]; }
+
+function render(d){
+  const msg = document.getElementById("msg");
+  if (d.error){ msg.style.display="flex"; msg.textContent = "⚠️ " + d.error + " — retrying…"; return; }
+  if (!d.candles || !d.candles.length){ msg.style.display="flex"; msg.textContent = "No candles yet."; return; }
+  msg.style.display = "none";
+  lastData = d;
+
+  const prec = digits(d.price);
+  candles.applyOptions({ priceFormat: { type:"price", precision: prec, minMove: Math.pow(10, -prec) } });
+  candles.setData(d.candles);
+  vwapLine.setData(d.vwap);
+  priceLines.forEach(p => candles.removePriceLine(p)); priceLines = [];
+  d.levels.forEach(l => priceLines.push(candles.createPriceLine({
+    price:l.price, color:LVL_COLOR[l.name]||"#888", lineWidth:1, lineStyle:2, axisLabelVisible:true, title:l.name })));
+  candles.setMarkers(d.signals.map(s => ({
+    time:s.time, position:s.bull?"belowBar":"aboveBar", color:s.bull?"#22C55E":"#EF4444",
+    shape:s.bull?"arrowUp":"arrowDown", text:(s.score===6?"☢ ":"")+"BOF "+s.score
+  })));
+  if (firstFit){
+    const n = d.candles.length;
+    chart.timeScale().setVisibleLogicalRange({from: Math.max(0, n - (tf==="1m"?120:tf==="5m"?90:60)), to: n + 3});
+    firstFit = false;
+  }
+
+  // quote
+  const ch = d.price - d.prevClose, pct = d.prevClose ? ch / d.prevClose * 100 : 0;
+  document.getElementById("price").textContent = fmt(d.price);
+  const c = document.getElementById("chg");
+  const fmtc = x => Number(x).toLocaleString("en-IN",{minimumFractionDigits:prec,maximumFractionDigits:prec});
+  c.textContent = (ch>=0?"▲ +":"▼ ") + fmtc(ch) + " (" + (pct>=0?"+":"") + pct.toFixed(2) + "%)";
+  c.className = "chg " + (ch>=0?"up":"down");
+  document.getElementById("upd").textContent = "Updated " + new Date(d.updated).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  const st = document.getElementById("status");
+  st.textContent = d.open ? "LIVE" : "CLOSED"; st.className = "pill" + (d.open ? " live" : "");
+
+  // levels
+  document.getElementById("levels").innerHTML = d.levels.map(l =>
+    `<span class="chip" style="border-color:${LVL_COLOR[l.name]}55">${l.name} <b>${fmt(l.price)}</b></span>`).join("")
+    + `<span class="chip" style="border-color:#F5C45155">VWAP <b>${d.vwap.length?fmt(d.vwap[d.vwap.length-1].value):"—"}</b></span>`;
+
+  // signals
+  const today = d.signals.filter(s => s.today).reverse();
+  const older = d.signals.filter(s => !s.today).reverse().slice(0, 6);
+  document.getElementById("sigcount").textContent = today.length + " today";
+  const card = s => {
+    const lvl = s.score >= 4 ? " hot" : "";
+    return `<div class="sig${lvl}" data-t="${s.time}">
+      <div class="top">
+        <div class="score s${s.score}">${s.score}/6</div>
+        <div><div class="t1">${s.score===6?"☢️ NUCLEAR · ":""}${s.bull?"Bullish":"Bearish"} BOF at ${s.level}</div>
+        <div class="t2">${s.today?"Today":dayStr(s.time)} ${hhmm(s.time)} · level ${fmt(s.levelPrice)}</div></div>
+        <span class="tag ${s.bull?"bull":"bear"}">${s.bull?"BUY SIDE":"SELL SIDE"}</span>
+      </div>
+      <div class="facts">${s.factors.map(f => `<div class="${f.ok?"ok":""}">${f.ok?"✅":"▫️"} ${f.name}</div>`).join("")}</div>
+      <div class="plan"><div><small>Entry</small><b>${fmt(s.entry)}</b></div>
+        <div><small>Stop loss</small><b class="down">${fmt(s.stop)}</b></div>
+        <div><small>Target 1:2</small><b class="up">${fmt(s.target)}</b></div></div>
+    </div>`;
+  };
+  let html = today.length ? today.map(card).join("")
+    : `<div class="empty">No breakout failures today yet.${d.open?" Watching live…":" Market closed."}</div>`;
+  if (older.length) html += `<h2 style="margin-top:18px"><small>Previous days</small></h2>` + older.map(card).join("");
+  document.getElementById("signals").innerHTML = html;
+  document.querySelectorAll(".sig").forEach(n => n.onclick = () => focusTime(+n.dataset.t));
+
+  setBadge(d.name, d.signals.filter(s=>s.today));
+}
+
+function focusTime(t){
+  if (!lastData) return;
+  const i = lastData.candles.findIndex(c => c.time >= t);
+  if (i < 0) return;
+  chart.timeScale().setVisibleLogicalRange({from: i - 40, to: i + 15});
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+/* ---------- tabs ---------- */
+function drawTabs(){
+  const tabsEl = document.getElementById("tabs");
+  tabsEl.classList.toggle("fx", mkt === "fx");
+  tabsEl.innerHTML = SYMS.map(s => {
+    const b = best[s];
+    const txt = b == null ? "…" : b === 0 ? "no BOF" : "best " + b + "/6";
+    return `<div class="tab${s===cur?" on":""}" data-s="${s}">${LABEL[s]}<span class="b${b>=4?" hot":""}">${txt}</span></div>`;
+  }).join("");
+  document.querySelectorAll(".tab").forEach(n => n.onclick = () => {
+    if (n.dataset.s === cur) return;
+    cur = n.dataset.s; firstFit = true; drawTabs(); refresh(true);
+  });
+}
+function setBadge(name, todaySigs){
+  best[name] = todaySigs.reduce((m, s) => Math.max(m, s.score), 0);
+  drawTabs();
+}
+
+document.querySelectorAll("#mkt button").forEach(b => b.onclick = () => {
+  if (b.dataset.m === mkt) return;
+  mkt = b.dataset.m; SYMS = GROUPS[mkt]; cur = SYMS[0]; firstFit = true;
+  document.querySelectorAll("#mkt button").forEach(x => x.classList.toggle("on", x === b));
+  drawTabs(); refresh(true).then(loadBadges);
+});
+
+document.querySelectorAll("#tfs button").forEach(b => b.onclick = () => {
+  tf = b.dataset.tf; firstFit = true;
+  document.querySelectorAll("#tfs button").forEach(x => x.classList.toggle("on", x === b));
+  refresh(true);
+});
+
+/* ---------- refresh loop ---------- */
+let busy = false;
+async function refresh(showLoading){
+  clearTimeout(timer);
+  if (showLoading){ const m = document.getElementById("msg"); m.style.display="flex"; m.textContent="Loading " + LABEL[cur] + "…"; }
+  if (!busy){
+    busy = true;
+    const want = cur + tf;
+    const d = await load(cur, tf);
+    busy = false;
+    if (want === cur + tf) render(d); else return refresh(true);
+  }
+  const open = lastData && lastData.open;
+  timer = setTimeout(() => refresh(false), open ? 30000 : 300000);
+}
+
+async function loadBadges(){
+  for (const s of SYMS.slice()){
+    if (s === cur) continue;
+    const d = await load(s, "5m");
+    if (!d.error && d.signals) setBadge(s, d.signals.filter(x => x.today));
+  }
+}
+
+/* alerts handled by TradingView on iPhone */
+function syncAlerts(){}
+
+drawTabs(); syncAlerts();
+if (!(window.navigator.standalone || matchMedia("(display-mode: standalone)").matches)) {
+  const ins = document.getElementById("install"); if (ins) ins.style.display = "block";
+}
+refresh(true).then(loadBadges);
+</script>
+</body>
+</html>
