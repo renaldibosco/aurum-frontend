@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
       if (!r.ok) continue;
       const body = await r.text();
       res.setHeader("Content-Type", "application/json");
-      res.setHeader("Cache-Control", "s-maxage=10, stale-while-revalidate=20");
+      res.setHeader("Cache-Control", interval === "1d" ? "s-maxage=1800, stale-while-revalidate=3600" : "s-maxage=30, stale-while-revalidate=120");
       res.status(200).send(body);
       return;
     } catch (e) {

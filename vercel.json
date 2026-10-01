@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "api/chart.js": { "regions": ["bom1"] },
+    "api/spot.js": { "regions": ["bom1"] }
+  }
+}
